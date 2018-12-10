@@ -1,7 +1,7 @@
 package ua.edu.ratos.edx;
 
 
-public class PoXHeaderInfo {
+public class POXHeaderInfo {
 	
 
 	private String imsx_version = "V1.01";

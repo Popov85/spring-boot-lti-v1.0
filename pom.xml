@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>edx</name>
-	<description>Test intergation for edX via LTI</description>
+	<description>Test integration for LMS via LTI</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

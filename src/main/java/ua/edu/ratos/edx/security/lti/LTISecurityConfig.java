@@ -1,6 +1,7 @@
-package ua.edu.ratos.edx.config;
+package ua.edu.ratos.edx.security.lti;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -17,46 +18,63 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
+import java.util.List;
 
 @Order(1)
 @EnableWebSecurity
-public class SecurityConfigLTI1p0 extends WebSecurityConfigurerAdapter {
+public class LTISecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private ConsumerDetailsServiceLTI1p0 ConsumerDetailsServiceLTI1p0;
+    private Environment environment;
+
 
     @Autowired
-    private AuthenticationHandlerLTI1p0 AuthenticationHandlerLTI1p0;
+    private LTIConsumerDetailsService ltiConsumerDetailsService;
 
+    @Autowired
+    private LTIAuthenticationHandler ltiAuthenticationHandler;
+
+    // CORS bean
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        List<String> allowedOrigins=Arrays.asList("*");
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(Arrays.asList("POST"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/lti/**/launch", configuration);
+        return source;
+    }
+
+    // OAuth/LTI 1.0 beans
     @Bean
     public OAuthProviderTokenServices oauthProviderTokenServices() {
-        // NOTE: we don't use the OAuthProviderTokenServices for 0-legged
-        // but it cannot be null
         return new InMemoryProviderTokenServices();
     }
 
     @Bean
-    public ProtectedResourceProcessingFilter lti1p0ProviderProcessingFilter() {
+    public ProtectedResourceProcessingFilter ltiProtectedResourceProcessingFilter() {
         ProtectedResourceProcessingFilter protectedResourceProcessingFilter =
-                new ProtectedResourceProcessingFilter();
-        protectedResourceProcessingFilter.setConsumerDetailsService(ConsumerDetailsServiceLTI1p0);
-        protectedResourceProcessingFilter.setAuthHandler(AuthenticationHandlerLTI1p0);
+                new LTIProtectedResourceProcessingFilter();
+        protectedResourceProcessingFilter.setConsumerDetailsService(ltiConsumerDetailsService);
+        protectedResourceProcessingFilter.setAuthHandler(ltiAuthenticationHandler);
         protectedResourceProcessingFilter.setTokenServices(oauthProviderTokenServices());
         protectedResourceProcessingFilter.setAuthenticationEntryPoint(new OAuthProcessingFilterEntryPoint());
         protectedResourceProcessingFilter.setNonceServices(new InMemoryNonceServices());
         // Fails if OAuth params are not included
-        protectedResourceProcessingFilter.setIgnoreMissingCredentials(true);
+        protectedResourceProcessingFilter.setIgnoreMissingCredentials(false);
         return protectedResourceProcessingFilter;
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("POST"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/lti1p0/launch", configuration);
-        return source;
+    public FilterRegistrationBean ltiProtectedResourceProcessingFilterRegistration() {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(ltiProtectedResourceProcessingFilter());
+        registration.addUrlPatterns("/lti/1p0/launch");
+        registration.setName("ltiProtectedResourceProcessingFilter");
+        registration.setOrder(1);
+        registration.setEnabled(false);
+        return registration;
     }
 
 
@@ -66,12 +84,13 @@ public class SecurityConfigLTI1p0 extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .cors()
             .and()
-            .addFilterBefore(lti1p0ProviderProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-            .antMatcher("/lti1p0/**")
+            .antMatcher("/lti/1p0/launch")
+            .addFilterBefore(ltiProtectedResourceProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .anyRequest().hasRole("OAUTH")
+            .anyRequest().hasRole("LTI")
             .and()
             .headers()
                 .frameOptions().disable();
     }
+
 }

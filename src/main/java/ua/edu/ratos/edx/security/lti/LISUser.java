@@ -1,4 +1,4 @@
-package ua.edu.ratos.edx.config;
+package ua.edu.ratos.edx.security.lti;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,13 +16,13 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class ToolConsumerUserLTI1p0 {
+public class LISUser {
     /**
-     * As per LTI v 1.1.1 specification the request parameter is called: "lis_person_name_given"
+     * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_person_name_given"
      */
     private final String name;
     /**
-     * As per LTI v 1.1.1 specification the request parameter is called: "lis_person_name_family"
+     * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_person_name_family"
      */
     private final String surname;
 }

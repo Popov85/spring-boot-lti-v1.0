@@ -1,4 +1,4 @@
-package ua.edu.ratos.edx;
+package ua.edu.ratos.edx.web.domain;
 
 
 public class POXHeaderInfo {

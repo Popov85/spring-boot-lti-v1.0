@@ -13,7 +13,8 @@ import org.springframework.security.oauth.consumer.client.OAuthRestTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import ua.edu.ratos.edx.*;
+import ua.edu.ratos.edx.web.domain.*;
+
 import java.net.URI;
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package ua.edu.ratos.edx.config;
+package ua.edu.ratos.edx.security.lti;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,13 +15,13 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class ToolConsumerOutcomeLTI1p0 {
+public class LTIOutcomeParams {
     /*
-     * As per LTI v 1.1.1 specification the request parameter is called: "lis_result_sourcedid".
+     * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_result_sourcedid".
      */
     private final String sourcedId;
     /**
-     * As per LTI v 1.1.1 specification the request parameter is called: "lis_outcome_service_url"
+     * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_outcome_service_url"
      */
     private final String outcomeURL;
 }

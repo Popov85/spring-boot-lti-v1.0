@@ -1,5 +1,7 @@
 package ua.edu.ratos.edx.security.lti;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth.common.OAuthException;
 import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
@@ -13,6 +15,8 @@ import java.util.Map;
 
 @Component
 public class LTIConsumerDetailsService implements ConsumerDetailsService {
+	
+	private static final Log LOG = LogFactory.getLog(LTIConsumerDetailsService.class);
 
     private Map<String, String> localKeySecretHolder = new HashMap<>();
 
@@ -27,7 +31,7 @@ public class LTIConsumerDetailsService implements ConsumerDetailsService {
             cd.setAuthorities(AuthorityUtils.createAuthorityList("ROLE_LTI"));
             // no token required (0-legged)
             cd.setRequiredToObtainAuthenticatedToken(false);
-            System.out.println("LTI success: found the client secret and created basic ConsumerDetails object :: "+cd);
+            LOG.debug("LTI success: found the client secret and created basic ConsumerDetails object :: "+cd);
             return cd;
         }
         throw new OAuthException("LTI failure: no client secret matching consumer key was found in DB");

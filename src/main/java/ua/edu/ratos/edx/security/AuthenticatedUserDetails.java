@@ -1,7 +1,6 @@
 package ua.edu.ratos.edx.security;
 
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,8 +32,8 @@ public class AuthenticatedUserDetails implements UserDetailsService {
         this.usersHolder.put("labassist@example.com", 2L);
         this.usersHolder.put("student@example.com", 3L);
 
-        this.passwordsHolder.put("admin@example.com", "password");
-        this.passwordsHolder.put("labassist@example.com", "password");
-        this.passwordsHolder.put("student@example.com", "password");
+        this.passwordsHolder.put("admin@example.com", "{noop}password");
+        this.passwordsHolder.put("labassist@example.com", "{noop}password");
+        this.passwordsHolder.put("student@example.com", "{noop}password");
     }
 }

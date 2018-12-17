@@ -1,6 +1,8 @@
 package ua.edu.ratos.edx.service;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class LTIOutcomeService {
+	
+	private static final Log LOG = LogFactory.getLog(LTIOutcomeService.class);
 
     private XmlMapper xmlMapper = new XmlMapper();
 
@@ -35,7 +39,7 @@ public class LTIOutcomeService {
         Optional<LTIOutcomeParams> outcome = principal.getOutcome();
 
         if (!outcome.isPresent()) {
-            System.out.println("Outcome parameters are not included, result is not sent to LMS :: "+ score);
+            LOG.debug("Outcome parameters are not included, result is not sent to LMS :: "+ score);
             return;
         }
 
@@ -62,7 +66,7 @@ public class LTIOutcomeService {
 
         ResponseEntity<String> result = authRestTemplate.postForEntity(new URI(outcomeURL),request, String.class);
 
-        System.out.println("Result  :: "+ score+", sent with status code :: "+ result.getStatusCode());
+        LOG.debug("Result  :: "+ score+", sent with status code :: "+ result.getStatusCode());
     }
 
     /**
@@ -70,7 +74,7 @@ public class LTIOutcomeService {
      * @param sourcedId a value needed to posting score to LMS as per LTI specification
      * @param messageIdentifier Some value for identifying messages (in our case the number of milliseconds since 1970)
      * @param textScore score between 0-1 gained by a user after learning session completion
-     * @return fully populated object ready to be XML-serialised according to LTI specification
+     * @return fully populated object ready to be XML-serialized according to LTI specification
      * @see <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-3">LTI v 1.1.1</a>
      */
     private IMSXPOXEnvelopeRequest getEnvelopeRequest(String sourcedId, String messageIdentifier, String textScore) {

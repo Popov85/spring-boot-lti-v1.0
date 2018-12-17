@@ -1,5 +1,7 @@
 package ua.edu.ratos.edx.security.lti;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +16,9 @@ import java.util.Collection;
 
 @Component
 public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
+	
+	private static final Log LOG = LogFactory.getLog(LTIAuthenticationHandler.class);
+
 
     private static final String LIS_EMAIL = "lis_person_contact_email_primary";
     private static final String LIS_USER_NAME = "lis_person_name_given";
@@ -93,11 +98,11 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(principal, signatureSecret, newAuthorities);
 
-                System.out.println("LTI user authentication successful :: "+auth);
+                LOG.debug("LTI user authentication successful :: "+auth);
                 return auth;
             }
         }
-        // So far Oauth parameters have been valid and client key matches client secret,
+        // So far OAuth parameters have been valid and client key matches client secret,
         // which is enough to authenticate LMS user
         LTIToolConsumerCredentials principal = LTIToolConsumerCredentials.create(lmsId, authentication.getConsumerCredentials());
 
@@ -106,7 +111,7 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
         // Stick to ROLE_LTI
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, signatureSecret, authentication.getAuthorities());
 
-        System.out.println("LTI LMS authentication successful :: "+ auth);
+        LOG.debug("LTI LMS authentication successful :: "+ auth);
         return auth;
     }
 }

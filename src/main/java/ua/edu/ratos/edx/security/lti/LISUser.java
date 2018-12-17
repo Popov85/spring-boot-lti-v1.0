@@ -1,9 +1,5 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * These fields (lis_person_name_given and lis_person_name_family) contain information about the user account that is performing this launch.

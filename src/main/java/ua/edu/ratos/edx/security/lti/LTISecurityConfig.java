@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -63,8 +62,8 @@ public class LTISecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public FilterRegistrationBean ltiProtectedResourceProcessingFilterRegistration() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<ProtectedResourceProcessingFilter> ltiProtectedResourceProcessingFilterRegistration() {
+        FilterRegistrationBean<ProtectedResourceProcessingFilter> registration = new FilterRegistrationBean<ProtectedResourceProcessingFilter>();
         registration.setFilter(ltiProtectedResourceProcessingFilter());
         registration.addUrlPatterns("/lti/1p0/launch");
         registration.setName("ltiProtectedResourceProcessingFilter");

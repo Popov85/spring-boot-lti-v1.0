@@ -1,10 +1,12 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.NonNull;
 import org.springframework.security.oauth.provider.ConsumerCredentials;
 
 public class LTIUserConsumerCredentials extends LTIToolConsumerCredentials {
-    /**
+  
+	private static final long serialVersionUID = 1L;
+	
+	/**
      * Unique identifier of a user within TP
      */
     private final Long userId;
@@ -14,7 +16,7 @@ public class LTIUserConsumerCredentials extends LTIToolConsumerCredentials {
         this.userId = userId;
     }
 
-    public static LTIUserConsumerCredentials create(@NonNull final Long userId, @NonNull final Long lmsId, @NonNull final ConsumerCredentials consumerCredentials) {
+    public static LTIUserConsumerCredentials create(final Long userId, final Long lmsId, final ConsumerCredentials consumerCredentials) {
         return new LTIUserConsumerCredentials(
                 userId, lmsId,
                 consumerCredentials.getConsumerKey(),

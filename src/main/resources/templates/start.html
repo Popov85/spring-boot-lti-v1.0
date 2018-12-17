@@ -11,11 +11,14 @@
 <p>Hello RATOS User <span th:text="${username}"/>! </p>
 
 <p>
-    <button onclick="location.href = 'localhost:8090/student/test';" id="start" class="float-left submit-button">
-        Start>>
-    </button>
+    <a href="http://localhost:8090/student/test" target="_self">Start>></a>
 </p>
 
+<p>
+    <button onclick="window.parent.location.href='http://localhost:8090/student/test';" id="start" class="float-left submit-button">
+        Start new window>>
+    </button>
+</p>
 
 
 </body>

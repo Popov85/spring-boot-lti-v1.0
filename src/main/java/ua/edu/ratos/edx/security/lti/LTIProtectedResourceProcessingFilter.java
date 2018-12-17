@@ -7,7 +7,7 @@ import org.springframework.security.oauth.provider.filter.ProtectedResourceProce
 public class LTIProtectedResourceProcessingFilter extends ProtectedResourceProcessingFilter {
 
     /**
-     * Default behaviour is to reset the Authentication to the previous state that was before doing this filter.
+     * Default behavior is to reset the Authentication to the previous state that was before doing this filter.
      * So if previous authentication was null, it will be again null after this filter has done its job.
      * Now we need to override this, by not letting null if it was null before.
      * Otherwise let this new authentication to remain and create authentication session

@@ -12,9 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import ua.edu.ratos.edx.security.lti.LTIAwareAccessDeniedHandler;
 import ua.edu.ratos.edx.security.lti.LTIAwareUsernamePasswordAuthenticationFilter;
+import ua.edu.ratos.edx.security.lti.LTISecurityUtils;
 
 @Order(2)
 @EnableWebSecurity
@@ -26,17 +29,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     // LTI Pre- bean
+    
+    @Autowired
+    private LTISecurityUtils ltiSecurityUtils;
+    
     @Bean
     public LTIAwareUsernamePasswordAuthenticationFilter ltiAwareUsernamePasswordAuthenticationFilter() throws Exception {
         LTIAwareUsernamePasswordAuthenticationFilter filter = new LTIAwareUsernamePasswordAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"));
+        filter.setLtiSecurityUtils(ltiSecurityUtils);
         return filter;
     }
 
     @Bean
-    public FilterRegistrationBean ltiAwareUsernamePasswordAuthenticationFilterRegistration() throws Exception {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+    public FilterRegistrationBean<LTIAwareUsernamePasswordAuthenticationFilter> ltiAwareUsernamePasswordAuthenticationFilterRegistration() throws Exception {
+        FilterRegistrationBean<LTIAwareUsernamePasswordAuthenticationFilter> registration = new FilterRegistrationBean<LTIAwareUsernamePasswordAuthenticationFilter>();
         registration.setFilter(ltiAwareUsernamePasswordAuthenticationFilter());
         registration.addUrlPatterns("/login");
         registration.setName("ltiAwareUsernamePasswordAuthenticationFilter");
@@ -59,17 +67,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .addFilterBefore(ltiAwareUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .antMatchers("/login*","/sign-in/**").permitAll()
+            .antMatchers("/login*","/sign-in/**","/accessDenied").permitAll()
             .antMatchers("/student/**").hasAnyRole("STUDENT")
+            .antMatchers("/admin/**").hasAnyRole("ADMIN")
             .and()
-            .formLogin();
+            .formLogin()
+            .and()
+            .headers()
+            	.frameOptions().disable()
+        	.and()
+            	.exceptionHandling().accessDeniedHandler(ltiAwareAccessDeniedHandler());
     }
 
-    @Override
+    @Bean
+    public AccessDeniedHandler ltiAwareAccessDeniedHandler() {
+		LTIAwareAccessDeniedHandler accessDeniedHandler = new LTIAwareAccessDeniedHandler();
+		accessDeniedHandler.setLtiSecurityUtils(ltiSecurityUtils);
+		return accessDeniedHandler;
+	}
+
+	@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsServiceBean()).passwordEncoder(passwordEncoder());
         auth.inMemoryAuthentication()
-            .withUser("test_student").password("{noop}password").roles("STUDENT");
+            .withUser("test_student").password("{noop}password").roles("STUDENT")
+            .and()
+            .withUser("test_admin").password("{noop}password").roles("ADMIN");
     }
 
     @Override

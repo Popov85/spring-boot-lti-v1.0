@@ -7,7 +7,9 @@ import java.util.Optional;
 
 public class LTIToolConsumerCredentials extends ConsumerCredentials implements Principal {
 
-    /**
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Unique identifier of a recognized TC (LMS) based on the pair key-secret;
      */
     private final Long lmsId;

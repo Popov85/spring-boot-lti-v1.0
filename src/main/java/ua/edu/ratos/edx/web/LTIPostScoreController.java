@@ -1,8 +1,10 @@
 package ua.edu.ratos.edx.web;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.imsglobal.pox.IMSPOXRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ua.edu.ratos.edx.service.LTIOutcomeService;
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +12,8 @@ import java.util.Enumeration;
 
 @RestController
 public class LTIPostScoreController {
+	
+	private static final Log LOG = LogFactory.getLog(LTIPostScoreController.class);
 
     @Autowired
     private LTIOutcomeService ltiOutcomeService;
@@ -28,22 +32,20 @@ public class LTIPostScoreController {
 
             = "http://localhost/courses/course-v1:edx-ratos-integration-initiative+123456+2018_T2/xblock/block-v1:edx-ratos-integration-initiative+123456+2018_T2+type@lti+block@de03e087e09d4629ab61ee44cea69b43/handler_noauth/grade_handler";
 
-    private static final String EDX_COURSE_POST_LINK_MOCK
-
-            = "http://localhost:8090/ratos/receive";
+    /*private static final String EDX_COURSE_POST_LINK_MOCK = "http://localhost:8090/ratos/receive";*/
 
 
     @GetMapping("/ratos/post-score-ims")
     @ResponseBody
     public String postScoreIms() throws Exception {
-        IMSPOXRequest.sendReplaceResult(EDX_COURSE_POST_LINK_MOCK, CLIENT_KEY, CLIENT_SECRET, LIS_RESULT_SOURCEID, RESULT);
+        IMSPOXRequest.sendReplaceResult(EDX_COURSE_POST_LINK, CLIENT_KEY, CLIENT_SECRET, LIS_RESULT_SOURCEID, RESULT);
         return "OK";
     }
 
     @GetMapping("/ratos/post-score-spring")
     @ResponseBody
     public String postScoreSpring(Authentication authentication) throws Exception {
-        System.out.println("Authentication :: "+authentication);
+    	LOG.debug("Authentication :: "+authentication);
         ltiOutcomeService.sendOutcome(authentication, Double.parseDouble(RESULT));
         return "OK";
     }
@@ -51,16 +53,16 @@ public class LTIPostScoreController {
     @PostMapping("/ratos/receive")
     @ResponseBody
     public String receiveScore(@RequestBody String body, HttpServletRequest request) throws Exception {
-        System.out.println("headers ::");
+    	LOG.debug("headers ::");
         Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 String nextElement = headerNames.nextElement();
-                System.out.println("Header :: " + nextElement + " ::"
+                LOG.debug("Header :: " + nextElement + " ::"
                         + request.getHeader(nextElement));
             }
         }
-        System.out.println("body :: " + body);
+        LOG.debug("body :: " + body);
         return "OK (see stacktrace for received parameters...)";
     }
 }

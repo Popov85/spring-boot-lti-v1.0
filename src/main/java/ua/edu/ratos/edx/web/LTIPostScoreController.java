@@ -1,25 +1,18 @@
 package ua.edu.ratos.edx.web;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.imsglobal.pox.IMSPOXRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
-import org.springframework.security.oauth.consumer.BaseProtectedResourceDetails;
-import org.springframework.security.oauth.consumer.client.OAuthRestTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import ua.edu.ratos.edx.web.domain.*;
-
-import java.net.URI;
-import java.util.Date;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;;
+import org.springframework.web.bind.annotation.*;
+import ua.edu.ratos.edx.service.LTIOutcomeService;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 @RestController
 public class LTIPostScoreController {
+
+    @Autowired
+    private LTIOutcomeService ltiOutcomeService;
 
     private static final String RESULT = "0.6";
 
@@ -40,61 +33,34 @@ public class LTIPostScoreController {
             = "http://localhost:8090/ratos/receive";
 
 
-    @GetMapping("/ratos/post-score")
+    @GetMapping("/ratos/post-score-ims")
     @ResponseBody
-    public String postScore() throws Exception {
-        IMSPOXRequest.sendReplaceResult(EDX_COURSE_POST_LINK, CLIENT_KEY, CLIENT_SECRET, LIS_RESULT_SOURCEID, RESULT);
+    public String postScoreIms() throws Exception {
+        IMSPOXRequest.sendReplaceResult(EDX_COURSE_POST_LINK_MOCK, CLIENT_KEY, CLIENT_SECRET, LIS_RESULT_SOURCEID, RESULT);
         return "OK";
     }
 
-    @GetMapping("/ratos/post-score-2")
+    @GetMapping("/ratos/post-score-spring")
     @ResponseBody
-    public String postScore2() throws Exception {
-        BaseProtectedResourceDetails resourceDetails = new BaseProtectedResourceDetails();
-        resourceDetails.setConsumerKey(CLIENT_KEY);
-        resourceDetails.setSharedSecret(new SharedConsumerSecretImpl(CLIENT_SECRET));
-
-        OAuthRestTemplate authRestTemplate = new OAuthRestTemplate(resourceDetails);
-
-        GradedResponse gradedResponse = new GradedResponse();
-        POXHeader poxHeader = new POXHeader();
-        POXHeaderInfo POXHeaderInfo = new POXHeaderInfo();
-        POXHeaderInfo.setImsx_messageIdentifier(String.valueOf(new Date().getTime()));
-        poxHeader.setInfo(POXHeaderInfo);
-        gradedResponse.setPoxHeader(poxHeader);
-        POXBody poxBody = new POXBody();
-        ReplaceResultRequest replaceResultRequest = new ReplaceResultRequest();
-        ResultRecord resultRecord = new ResultRecord();
-        Result r = new Result();
-
-        ResultScore resultScore = new ResultScore();
-
-        SourcedGUID sourcedGUID = new SourcedGUID();
-        sourcedGUID.setSourcedId(LIS_RESULT_SOURCEID);
-        resultRecord.setSource(sourcedGUID);
-
-        resultScore.setTextString(RESULT);
-        r.setResultScore(resultScore);
-        resultRecord.setResult(r);
-
-        replaceResultRequest.setResultRecord(resultRecord);
-
-        poxBody.setReplaceResultRequest(replaceResultRequest);
-        gradedResponse.setPoxBody(poxBody);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_XML);
-
-        XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
-
-        String body = xmlMapper.writeValueAsString(gradedResponse);
-
-        HttpEntity<String> request = new HttpEntity<String>(body, headers);
-
-        ResponseEntity<String> result = authRestTemplate.postForEntity(new URI(EDX_COURSE_POST_LINK),request, String.class);
-        System.out.println("RESULT ::"+result.getStatusCode());
-
+    public String postScoreSpring(Authentication authentication) throws Exception {
+        System.out.println("Authentication :: "+authentication);
+        ltiOutcomeService.sendOutcome(authentication, Double.parseDouble(RESULT));
         return "OK";
+    }
+
+    @PostMapping("/ratos/receive")
+    @ResponseBody
+    public String receiveScore(@RequestBody String body, HttpServletRequest request) throws Exception {
+        System.out.println("headers ::");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String nextElement = headerNames.nextElement();
+                System.out.println("Header :: " + nextElement + " ::"
+                        + request.getHeader(nextElement));
+            }
+        }
+        System.out.println("body :: " + body);
+        return "OK (see stacktrace for received parameters...)";
     }
 }

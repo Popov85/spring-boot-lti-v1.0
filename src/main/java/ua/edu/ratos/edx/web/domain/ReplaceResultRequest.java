@@ -1,5 +1,6 @@
 package ua.edu.ratos.edx.web.domain;
 
+
 public class ReplaceResultRequest {
 	
 	private ResultRecord resultRecord;
@@ -8,8 +9,8 @@ public class ReplaceResultRequest {
 		return resultRecord;
 	}
 
-	public void setResultRecord(ResultRecord resultRecord) {
+	public ReplaceResultRequest setResultRecord(ResultRecord resultRecord) {
 		this.resultRecord = resultRecord;
+		return this;
 	}
-
 }

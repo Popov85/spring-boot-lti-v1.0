@@ -1,6 +1,5 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -8,8 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ua.edu.ratos.security.AuthenticatedUser;
-
+import ua.edu.ratos.edx.security.AuthenticatedUser;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +23,6 @@ import java.util.List;
  * and if exists, remember this authentication, clear security context, try to authenticate with UsernamePasswordAuthenticationFilter
  * and(if successful) add the previous LTI-specific authentication to the new authentication. That's it.
  */
-@Slf4j
 public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
@@ -33,18 +30,18 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
         Authentication previousAuth = SecurityContextHolder.getContext().getAuthentication();
         // Check for LMS LTI v1p0 authentication in place
         if (isLMSUserWithOnlyLTIRole(previousAuth)) {
-            log.debug("LTI authentication exists, try to authenticate with UsernamePasswordAuthenticationFilter in the usual way");
+            System.out.println("LTI authentication exists, try to authenticate with UsernamePasswordAuthenticationFilter in the usual way");
             SecurityContextHolder.clearContext();
             Authentication authentication = null;
             try {// Attempt to authenticate with standard UsernamePasswordAuthenticationFilter
                 authentication = super.attemptAuthentication(request, response);
             } catch (AuthenticationException e) {
                 // If fails by throwing an exception, catch it in unsuccessfulAuthentication() method
-                log.debug("Failed to upgrade authentication with UsernamePasswordAuthenticationFilter");
+                System.out.println("Failed to upgrade authentication with UsernamePasswordAuthenticationFilter");
                 SecurityContextHolder.getContext().setAuthentication(previousAuth);
                 throw e;
             }
-            log.debug("Obtained a valid authentication with UsernamePasswordAuthenticationFilter");
+            System.out.println("Obtained a valid authentication with UsernamePasswordAuthenticationFilter");
             AuthenticatedUser authenticatedUser = (AuthenticatedUser) authentication.getPrincipal();
             Long userId = authenticatedUser.getUserId();
             String email = authenticatedUser.getUsername();
@@ -62,10 +59,10 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
 
             Authentication newAuth = new UsernamePasswordAuthenticationToken(
                     ltiUserConsumerCredentials, previousAuth.getCredentials(), Collections.unmodifiableList(updatedAuthorities));
-            log.debug("Created an updated authentication for user ID :: {}", userId);
+            System.out.println("Created an updated authentication for user ID :: "+ userId);
             return newAuth;
         }
-        log.debug("No LTI authentication exists, try to authenticate with UsernamePasswordAuthenticationFilter in the usual way");
+        System.out.println("No LTI authentication exists, try to authenticate with UsernamePasswordAuthenticationFilter in the usual way");
         return super.attemptAuthentication(request, response);
     }
 
@@ -74,12 +71,12 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
             throws IOException, ServletException {
         Authentication previousAuth = SecurityContextHolder.getContext().getAuthentication();
         if (isLMSUserWithOnlyLTIRole(previousAuth)) {
-            log.debug("unsuccessfulAuthentication upgrade for LTI user, previous authentication :: {}", previousAuth);
+            System.out.println("unsuccessfulAuthentication upgrade for LTI user, previous authentication :: "+ previousAuth);
             super.unsuccessfulAuthentication(request, response, failed);
-            log.debug("Unsuccessful authentication upgrade for LTI user, fallback to previous authentication");
+            System.out.println("Unsuccessful authentication upgrade for LTI user, fallback to previous authentication");
             SecurityContextHolder.getContext().setAuthentication(previousAuth);
         } else {
-            log.debug("unsuccessfulAuthentication for non-LTI user with UsernamePasswordAuthenticationFilter");
+            System.out.println("unsuccessfulAuthentication for non-LTI user with UsernamePasswordAuthenticationFilter");
             super.unsuccessfulAuthentication(request, response, failed);
         }
 

@@ -1,6 +1,6 @@
 package ua.edu.ratos.edx.web.domain;
 
-public class POXBody {
+public class IMSXPOXBody {
 	
 	private ReplaceResultRequest replaceResultRequest;
 
@@ -8,8 +8,8 @@ public class POXBody {
 		return replaceResultRequest;
 	}
 
-	public void setReplaceResultRequest(ReplaceResultRequest replaceResultRequest) {
+	public IMSXPOXBody setReplaceResultRequest(ReplaceResultRequest replaceResultRequest) {
 		this.replaceResultRequest = replaceResultRequest;
+		return this;
 	}
-
 }

@@ -1,6 +1,5 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
-@Slf4j
 @Component
 public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
 
@@ -22,7 +20,6 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
     private static final String LIS_USER_SURNAME = "lis_person_name_family";
     private static final String LIS_SOURCED = "lis_result_sourcedid";
     private static final String LIS_OUTCOME_URL = "lis_outcome_service_url";
-
 
     /**
      * Handles LTI authentication within the so-called "launch request" as per LTI specification (see also section)
@@ -84,7 +81,6 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
         // At this stage we already know that the consumer key matches the client secret
         Long lmsId = 1L;
 
-
         if (email!=null && !email.isEmpty()) {
             String user = "staff@example.com";
             if (user!=null) {
@@ -97,7 +93,7 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(principal, signatureSecret, newAuthorities);
 
-                log.debug("LTI user authentication successful :: {}", auth);
+                System.out.println("LTI user authentication successful :: "+auth);
                 return auth;
             }
         }
@@ -110,7 +106,7 @@ public class LTIAuthenticationHandler implements OAuthAuthenticationHandler {
         // Stick to ROLE_LTI
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, signatureSecret, authentication.getAuthorities());
 
-        log.debug("LTI LMS authentication successful :: {}", auth);
+        System.out.println("LTI LMS authentication successful :: "+ auth);
         return auth;
     }
 }

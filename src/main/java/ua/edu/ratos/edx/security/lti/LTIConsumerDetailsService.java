@@ -1,7 +1,5 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth.common.OAuthException;
 import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
@@ -13,7 +11,6 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @Component
 public class LTIConsumerDetailsService implements ConsumerDetailsService {
 
@@ -30,7 +27,7 @@ public class LTIConsumerDetailsService implements ConsumerDetailsService {
             cd.setAuthorities(AuthorityUtils.createAuthorityList("ROLE_LTI"));
             // no token required (0-legged)
             cd.setRequiredToObtainAuthenticatedToken(false);
-            log.debug("LTI success: found the client secret and created basic ConsumerDetails object, {}", cd);
+            System.out.println("LTI success: found the client secret and created basic ConsumerDetails object :: "+cd);
             return cd;
         }
         throw new OAuthException("LTI failure: no client secret matching consumer key was found in DB");
@@ -38,9 +35,9 @@ public class LTIConsumerDetailsService implements ConsumerDetailsService {
 
 	@PostConstruct
     public void init() {
-	    this.localKeySecretHolder.put("edx_ratos_key", "edx_ratos_secret");
-        this.localKeySecretHolder.put("edx_ratos_key_1", "edx_ratos_secret_1");
-        this.localKeySecretHolder.put("edx_ratos_key_2", "edx_ratos_secret_2");
+	    this.localKeySecretHolder.put("ratos_consumer_key", "ratos_client_secret");
+        this.localKeySecretHolder.put("ratos_consumer_key_1", "ratos_client_secret_1");
+        this.localKeySecretHolder.put("ratos_consumer_key_2", "ratos_client_secret_2");
     }
 
 }

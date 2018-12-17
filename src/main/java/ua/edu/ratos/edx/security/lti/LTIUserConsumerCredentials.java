@@ -1,16 +1,8 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.springframework.security.oauth.provider.ConsumerCredentials;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class LTIUserConsumerCredentials extends LTIToolConsumerCredentials {
     /**
      * Unique identifier of a user within TP
@@ -30,5 +22,16 @@ public class LTIUserConsumerCredentials extends LTIToolConsumerCredentials {
                 consumerCredentials.getSignatureMethod(),
                 consumerCredentials.getSignatureBaseString(),
                 consumerCredentials.getToken());
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    @Override
+    public String toString() {
+        return "LTIUserConsumerCredentials{" +
+                "userId=" + userId +
+                '}';
     }
 }

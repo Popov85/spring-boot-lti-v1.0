@@ -10,46 +10,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-public class LTIController {
+public class LTILaunchController {
 
 	@GetMapping("/student/start")
-	public String start() {
+	public String start(Principal principal) {
+		System.out.println("Principal :: "+principal);
 		return "start";
 	}
 
 	@GetMapping("/student/test")
 	@ResponseBody
-	public String test() {
-		return "OK";
+	public String test(Principal principal) {
+		System.out.println("Principal :: "+principal);
+		return "Here comes the first question...";
 	}
 
 
 	@CrossOrigin({"http://localhost:18010", "http://localhost"})
-	@PostMapping("/lti1p0/launch")
+	@PostMapping("/lti/1p0/launch")
 	public String startPost(HttpServletRequest request, Principal principal) throws Exception {
-		printParameters(request);
-		System.out.println("Principal.class :: "+principal.getClass());
 		System.out.println("Principal :: "+principal);
-		// here should work
+		printParameters(request);
 		return "redirect:/student/start";
 	}
-
-	@PostMapping("/ratos/receive")
-	@ResponseBody
-	public String receiveScore(@RequestBody String body, HttpServletRequest request) throws Exception {
-		System.out.println("body :: " + body);
-		System.out.println("headers ::");
-		Enumeration<String> headerNames = request.getHeaderNames();
-		if (headerNames != null) {
-			while (headerNames.hasMoreElements()) {
-				String nextElement = headerNames.nextElement();
-				System.out.println("Header :: " + nextElement + " ::"
-						+ request.getHeader(nextElement));
-			}
-		}
-		return "OK";
-	}
-
 
 	private void printParameters(HttpServletRequest request) {
 		Map params = request.getParameterMap();

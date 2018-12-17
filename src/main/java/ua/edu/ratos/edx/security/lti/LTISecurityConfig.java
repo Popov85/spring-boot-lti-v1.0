@@ -25,10 +25,6 @@ import java.util.List;
 public class LTISecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private Environment environment;
-
-
-    @Autowired
     private LTIConsumerDetailsService ltiConsumerDetailsService;
 
     @Autowired

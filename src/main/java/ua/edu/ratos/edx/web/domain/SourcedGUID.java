@@ -8,7 +8,8 @@ public class SourcedGUID {
 		return sourcedId;
 	}
 
-	public void setSourcedId(String sourcedId) {
+	public SourcedGUID setSourcedId(String sourcedId) {
 		this.sourcedId = sourcedId;
+		return this;
 	}
 }

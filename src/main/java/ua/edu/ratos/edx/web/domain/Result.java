@@ -1,5 +1,6 @@
 package ua.edu.ratos.edx.web.domain;
 
+
 public class Result {
 	
 	private ResultScore resultScore;
@@ -8,7 +9,8 @@ public class Result {
 		return resultScore;
 	}
 
-	public void setResultScore(ResultScore resultScore) {
+	public Result setResultScore(ResultScore resultScore) {
 		this.resultScore = resultScore;
+		return this;
 	}
 }

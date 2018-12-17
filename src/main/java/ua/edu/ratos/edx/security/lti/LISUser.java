@@ -12,10 +12,6 @@ import lombok.ToString;
  * These parameters are recommended unless they are suppressed because of privacy settings.
  * @see <a href="http://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide">LTI v 1.1.1</a>
  */
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
 public class LISUser {
     /**
      * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_person_name_given"
@@ -25,4 +21,25 @@ public class LISUser {
      * As per LTI v 1.1.1 specification the launch request parameter is called: "lis_person_name_family"
      */
     private final String surname;
+
+    public LISUser(String name, String surname) {
+        this.name = name;
+        this.surname = surname;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    @Override
+    public String toString() {
+        return "LISUser{" +
+                "name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                '}';
+    }
 }

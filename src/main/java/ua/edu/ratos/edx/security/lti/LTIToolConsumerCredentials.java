@@ -1,19 +1,10 @@
 package ua.edu.ratos.edx.security.lti;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-import org.springframework.security.oauth.provider.ConsumerCredentials;
 
+import org.springframework.security.oauth.provider.ConsumerCredentials;
 import java.security.Principal;
 import java.util.Optional;
 
-@Getter
-@Setter
-@ToString
-@Accessors(chain = true)
 public class LTIToolConsumerCredentials extends ConsumerCredentials implements Principal {
 
     /**
@@ -26,7 +17,7 @@ public class LTIToolConsumerCredentials extends ConsumerCredentials implements P
         this.lmsId = lmsId;
     }
 
-    public static LTIToolConsumerCredentials create(@NonNull final Long lmsId, @NonNull final ConsumerCredentials consumerCredentials) {
+    public static LTIToolConsumerCredentials create(final Long lmsId, final ConsumerCredentials consumerCredentials) {
         return new LTIToolConsumerCredentials(lmsId,
                 consumerCredentials.getConsumerKey(),
                 consumerCredentials.getSignature(),
@@ -41,6 +32,20 @@ public class LTIToolConsumerCredentials extends ConsumerCredentials implements P
 
     private LTIOutcomeParams outcome;
 
+    public LTIToolConsumerCredentials setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public LTIToolConsumerCredentials setUser(LISUser user) {
+        this.user = user;
+        return this;
+    }
+
+    public LTIToolConsumerCredentials setOutcome(LTIOutcomeParams outcome) {
+        this.outcome = outcome;
+        return this;
+    }
 
     /**
      * Recommended parameter to include to a launch request to smoothly recognize a learner;
@@ -65,9 +70,21 @@ public class LTIToolConsumerCredentials extends ConsumerCredentials implements P
         return Optional.ofNullable(outcome);
     }
 
+    public Long getLmsId() {
+        return lmsId;
+    }
+
     @Override
     public String getName() {
         return lmsId.toString();
     }
 
+    @Override
+    public String toString() {
+        return "LTIToolConsumerCredentials{" +
+                "lmsId=" + lmsId +
+                ", email='" + email + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }

@@ -1,6 +1,5 @@
 package ua.edu.ratos.edx.web;
 
-
 import java.security.Principal;
 import java.util.Enumeration;
 import java.util.Iterator;

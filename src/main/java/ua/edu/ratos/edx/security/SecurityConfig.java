@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public LTIAwareUsernamePasswordAuthenticationFilter ltiAwareUsernamePasswordAuthenticationFilter() throws Exception {
         LTIAwareUsernamePasswordAuthenticationFilter filter = new LTIAwareUsernamePasswordAuthenticationFilter();
         filter.setAuthenticationManager(authenticationManager());
-        filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"));
+        filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login-custom?error=true"));
         filter.setLtiSecurityUtils(ltiSecurityUtils);
         return filter;
     }
@@ -68,10 +68,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(ltiAwareUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
             .antMatchers("/login*","/sign-in/**","/accessDenied").permitAll()
+            .antMatchers("/sign-up*").hasAnyRole("LTI")
             .antMatchers("/student/**").hasAnyRole("STUDENT")
             .antMatchers("/admin/**").hasAnyRole("ADMIN")
             .and()
-            .formLogin()
+            .formLogin().loginPage("/login-custom").loginProcessingUrl("/login")
             .and()
             .headers()
             	.frameOptions().disable()

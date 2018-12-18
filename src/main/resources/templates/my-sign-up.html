@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Start</title>
+<link rel="stylesheet" type="text/css"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" />
+</head>
+<body>
+	<div class="container">
+		<form class="form-signin" method="post" action="/sign-up-accept">
+			<h2 class="form-signin-heading">Enter your requisites:</h2>
+			<div th:if="${error== true}" class="alert alert-danger" role="alert">Bad credentials</div>
+			<p>
+				<label for="name" class="sr-only">Name*</label> 
+				<input type="text" id="name" name="name" class="form-control"
+					placeholder="name" required autofocus>
+			</p>
+			
+			<p>
+				<label for="surname" class="sr-only">Surname*</label> 
+				<input type="text" id="surname" name="surname" class="form-control"
+					placeholder="surname" required autofocus>
+			</p>
+			<p>
+				<label for="username" class="sr-only">E-mail*</label> 
+				<input type="text" id="username" name="username" class="form-control"
+					placeholder="e-mail" required autofocus>
+			</p>
+			<p>
+				<label for="password" class="sr-only">Password*</label>
+				<input type="password" id="password" name="password" class="form-control"
+					placeholder="password" required>
+			</p>
+				<p>
+				<label for="password2" class="sr-only">Password*</label>
+				<input type="password" id="password2" name="password2" class="form-control"
+					placeholder="password2" required>
+			</p>
+
+			<p>
+				<label for="faculty" class="sr-only">Faculty*</label> <input
+					type="text" id="facutly" name="faculty" class="form-control"
+					placeholder="faculty" required>
+			</p>
+
+
+			<p>
+				<label for="year" class="sr-only">Year of enrollment*</label> <select
+					id="year" name="year" class="form-control" required>
+					<option value="2017">2017</option>
+					<option value="2018">2018</option>
+					<option value="2019">2019</option>
+					<option value="2020">2020</option>
+				</select>
+			</p>
+
+
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
+			<a href="/login-custom" target="_self">Cancel</a>
+		</form>
+	</div>
+</body>
+</html>

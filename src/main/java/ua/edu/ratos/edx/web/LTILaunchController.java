@@ -9,12 +9,38 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 
 @Controller
 public class LTILaunchController {
 	
 	private static final Log LOG = LogFactory.getLog(LTILaunchController.class);
+	
+	
+	@GetMapping("/login-custom")
+	public ModelAndView login(@RequestParam(value = "error", required = false, defaultValue = "false") boolean error, Principal principal) {
+		LOG.debug("Custom log-in, Principal :: "+principal);
+		ModelAndView model = new ModelAndView("my-sign-in");
+		if (error) {
+			model.addObject("error", true);
+			return model;
+		}
+		return model;
+	}
+	
+	@GetMapping("/sign-up")
+	public ModelAndView signUp( Principal principal) {
+		LOG.debug("Custom sign-up, Principal :: "+principal);
+		ModelAndView model = new ModelAndView("my-sign-up");
+		return model;
+	}
+	
+	@PostMapping("/sign-up-accept")
+	@ResponseBody
+	public void signUpAccept(@RequestBody Object body) {
+		LOG.debug(body);
+	}
 	
 	@GetMapping("/admin/start")
 	@ResponseBody

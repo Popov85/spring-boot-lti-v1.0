@@ -10,10 +10,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
-public class LTIAwareAccessDeniedHandler implements AccessDeniedHandler {
+public class LTIAwareAccessDeniedHandler extends AccessDeniedHandlerImpl {
 	
 	private static final Log LOG = LogFactory.getLog(LTIAwareAccessDeniedHandler.class);
 	
@@ -41,13 +42,21 @@ public class LTIAwareAccessDeniedHandler implements AccessDeniedHandler {
 			RequestCache requestCache = new HttpSessionRequestCache();
 			requestCache.saveRequest(request, response);
 			
-			response.sendRedirect(request.getContextPath() + "/login");
+			response.sendRedirect(request.getContextPath() + "/login-custom");
 			return;
 		}
 		
-		LOG.debug("Ordinary redirection to /accessDenied URL..");
+		// Already authorized user lacking authorities
+		if (auth!=null) {
+			LOG.debug("Ordinary redirection to /accessDenied URL..");
+	        response.sendRedirect(request.getContextPath() + "/accessDenied");
+			return;
+		}
 		
-		response.sendRedirect(request.getContextPath() + "/accessDenied");
+		// Anonymous user
+		LOG.debug("Anonymous..");
+        response.sendRedirect(request.getContextPath() + "/login-custom");
+		//super.handle(request, response, accessDeniedException);
 	}
 
 }

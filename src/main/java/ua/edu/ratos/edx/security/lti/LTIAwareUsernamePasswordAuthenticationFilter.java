@@ -28,9 +28,7 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
 	
 	private static final Log LOG = LogFactory.getLog(LTIAwareUsernamePasswordAuthenticationFilter.class);
 
-	
 	private LTISecurityUtils ltiSecurityUtils;
-	
 
 	public LTISecurityUtils getLtiSecurityUtils() {
 		return ltiSecurityUtils;
@@ -81,7 +79,6 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
         return super.attemptAuthentication(request, response);
     }
 
-
 	@Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
@@ -95,9 +92,5 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
         	LOG.debug("unsuccessfulAuthentication for non-LTI user with UsernamePasswordAuthenticationFilter");
             super.unsuccessfulAuthentication(request, response, failed);
         }
-
     }
-
-  
-
 }

@@ -9,31 +9,32 @@ public class IMSXPOXEnvelopeRequest {
 	@JacksonXmlProperty(isAttribute = true)
 	private final String xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0";
 	
-	@JacksonXmlProperty(localName = "imsx_POXHeader")
-	private IMSXPOXHeader IMSXPOXHeader;
+	private IMSXPOXHeader imsxPOXHeader;
 	
-	@JacksonXmlProperty(localName = "imsx_POXBody")
-	private IMSXPOXBody IMSXPOXBody;
+	private IMSXPOXBody imsxPOXBody;
 
 	public String getXmlns() {
 		return xmlns;
 	}
 
-	public ua.edu.ratos.edx.web.domain.IMSXPOXHeader getIMSXPOXHeader() {
-		return IMSXPOXHeader;
+	public IMSXPOXHeader getIMSXPOXHeader() {
+		return imsxPOXHeader;
 	}
 
-	public IMSXPOXEnvelopeRequest setIMSXPOXHeader(ua.edu.ratos.edx.web.domain.IMSXPOXHeader IMSXPOXHeader) {
-		this.IMSXPOXHeader = IMSXPOXHeader;
+	@JacksonXmlProperty(localName = "imsx_POXHeader")
+	public IMSXPOXEnvelopeRequest setIMSXPOXHeader(IMSXPOXHeader IMSXPOXHeader) {
+		this.imsxPOXHeader = IMSXPOXHeader;
 		return this;
 	}
 
-	public ua.edu.ratos.edx.web.domain.IMSXPOXBody getIMSXPOXBody() {
-		return IMSXPOXBody;
+	public IMSXPOXBody getIMSXPOXBody() {
+		return imsxPOXBody;
 	}
 
-	public IMSXPOXEnvelopeRequest setIMSXPOXBody(ua.edu.ratos.edx.web.domain.IMSXPOXBody IMSXPOXBody) {
-		this.IMSXPOXBody = IMSXPOXBody;
+	@JacksonXmlProperty(localName = "imsx_POXBody")
+	public IMSXPOXEnvelopeRequest setIMSXPOXBody(IMSXPOXBody IMSXPOXBody) {
+		this.imsxPOXBody = IMSXPOXBody;
 		return this;
 	}
+	
 }

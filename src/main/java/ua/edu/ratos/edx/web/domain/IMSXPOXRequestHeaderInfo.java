@@ -5,7 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 public class IMSXPOXRequestHeaderInfo {
 
 	@JacksonXmlProperty(localName = "imsx_version")
-	private final String imsxVersion = "V1.01";
+	private final String imsxVersion = "V1.0";
 
 	@JacksonXmlProperty(localName = "imsx_messageIdentifier")
 	private String imsxMessageIdentifier;

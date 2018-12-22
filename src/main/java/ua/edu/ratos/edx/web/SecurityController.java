@@ -3,6 +3,7 @@ package ua.edu.ratos.edx.web;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,9 +15,22 @@ import ua.edu.ratos.edx.repository.LocalClassesHolder;
 import ua.edu.ratos.edx.repository.LocalFacultiesHolder;
 import ua.edu.ratos.edx.repository.LocalOrganisationsHolder;
 import ua.edu.ratos.edx.repository.LocalStudentHolder;
+import ua.edu.ratos.edx.service.XMLScoreRequestBodyBuilder;
+import ua.edu.ratos.edx.web.domain.IMSXPOXBody;
+import ua.edu.ratos.edx.web.domain.IMSXPOXEnvelopeRequest;
+import ua.edu.ratos.edx.web.domain.IMSXPOXHeader;
+import ua.edu.ratos.edx.web.domain.IMSXPOXRequestHeaderInfo;
+import ua.edu.ratos.edx.web.domain.ReplaceResultRequest;
+import ua.edu.ratos.edx.web.domain.Result;
+import ua.edu.ratos.edx.web.domain.ResultRecord;
+import ua.edu.ratos.edx.web.domain.ResultScore;
+import ua.edu.ratos.edx.web.domain.SourcedGUID;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.*;
 import java.security.Principal;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.Set;
 
 @Controller
@@ -145,6 +159,35 @@ public class SecurityController {
     public String admin(Principal principal) {
         LOG.debug("Principal :: "+principal);
         return "admin";
+    }
+    
+    @Autowired
+	private XMLScoreRequestBodyBuilder xmlScoreRequestBodyBuilder;
+    
+    @GetMapping("/body")
+    @ResponseBody
+    public String getBody() throws Exception {
+    	String messageIdentifier = Long.toString(new Date().getTime());
+        String body = xmlScoreRequestBodyBuilder.getEnvelopeRequestBodyAsString("sourcedId", messageIdentifier, "0.5");
+        LOG.debug("body :: "+body);
+        return body;
+    }
+    
+    @PostMapping("/ratos/receive")
+    @ResponseStatus(code = HttpStatus.OK)
+    @ResponseBody
+    public void receiveScore(@RequestBody String body, HttpServletRequest request) throws Exception {
+    	LOG.debug("headers ::");
+        Enumeration<String> headerNames = request.getHeaderNames();
+        if (headerNames != null) {
+            while (headerNames.hasMoreElements()) {
+                String nextElement = headerNames.nextElement();
+                LOG.debug("Header :: " + nextElement + " ::"
+                        + request.getHeader(nextElement));
+            }
+        }
+        LOG.debug("body :: " + body);
+       
     }
 
 }

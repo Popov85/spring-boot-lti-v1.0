@@ -1,6 +1,7 @@
 package ua.edu.ratos.edx.service;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpEntity;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import ua.edu.ratos.edx.security.lti.LTIOutcomeParams;
 import ua.edu.ratos.edx.security.lti.LTIUserConsumerCredentials;
 import ua.edu.ratos.edx.web.domain.*;
+
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
@@ -24,7 +27,14 @@ public class LTIOutcomeService {
 	
 	private static final Log LOG = LogFactory.getLog(LTIOutcomeService.class);
 
-    private XmlMapper xmlMapper = new XmlMapper();
+    private XmlMapper xmlMapper;
+
+    @PostConstruct
+    public void init() {
+        xmlMapper = new XmlMapper();
+        xmlMapper.configure(ToXmlGenerator.Feature.WRITE_XML_DECLARATION, true);
+
+    }
 
     /**
      * Sends score to Learning Management System (LMS) if it was configured to allow sending outcomes,

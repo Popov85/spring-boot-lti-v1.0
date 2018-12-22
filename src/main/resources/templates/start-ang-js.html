@@ -20,22 +20,12 @@
 </p>
 </body>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
 <script type='text/javascript'>
-    $("#start").click(function(e) {
-        //alert('ok');
-        $.ajax({
-            type: "GET",
-            url: "/student/data",
-            data: {},
-            success: function(result) {
-                alert('ok'+result);
-            },
-            error: function(result) {
-                alert('error');
-            }
-        });
-    });
+    angular.module("test", [])
+        .controller("data", function($scope, $http) {
+
+        })
 </script>
 
 </html>

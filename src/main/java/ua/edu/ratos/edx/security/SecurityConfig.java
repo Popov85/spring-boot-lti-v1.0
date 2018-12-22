@@ -29,7 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     // LTI Pre- bean
-    
     @Autowired
     private LTISecurityUtils ltiSecurityUtils;
     
@@ -67,8 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .addFilterBefore(ltiAwareUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
             .authorizeRequests()
-            .antMatchers("/login*","/sign-in/**","/accessDenied").permitAll()
-            .antMatchers("/sign-up*").hasAnyRole("LTI")
+            .antMatchers("/login*","/access-denied").permitAll()
+            .antMatchers("/sign-up/**").hasAnyRole("LTI","ANONYMOUS")
             .antMatchers("/student/**").hasAnyRole("STUDENT")
             .antMatchers("/admin/**").hasAnyRole("ADMIN")
             .and()

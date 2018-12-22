@@ -1,66 +1,116 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Start</title>
-<link rel="stylesheet" type="text/css"
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" />
-<link rel="stylesheet" type="text/css"
-	href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" />
+    <meta charset="UTF-8">
+    <title>Sign-up</title>
+    <link rel="stylesheet" type="text/css" href="/bootstrap-3.3.7.min.css"/>
+    <!--<link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css"/>-->
 </head>
 <body>
-	<div class="container">
-		<form class="form-signin" method="post" action="/sign-up-accept">
-			<h2 class="form-signin-heading">Enter your requisites:</h2>
-			<div th:if="${error== true}" class="alert alert-danger" role="alert">Bad credentials</div>
-			<p>
-				<label for="name" class="sr-only">Name*</label> 
-				<input type="text" id="name" name="name" class="form-control"
-					placeholder="name" required autofocus>
-			</p>
-			
-			<p>
-				<label for="surname" class="sr-only">Surname*</label> 
-				<input type="text" id="surname" name="surname" class="form-control"
-					placeholder="surname" required autofocus>
-			</p>
-			<p>
-				<label for="username" class="sr-only">E-mail*</label> 
-				<input type="text" id="username" name="username" class="form-control"
-					placeholder="e-mail" required autofocus>
-			</p>
-			<p>
-				<label for="password" class="sr-only">Password*</label>
-				<input type="password" id="password" name="password" class="form-control"
-					placeholder="password" required>
-			</p>
-				<p>
-				<label for="password2" class="sr-only">Password*</label>
-				<input type="password" id="password2" name="password2" class="form-control"
-					placeholder="password2" required>
-			</p>
+<div class="container">
+    <form action="#" th:action="@{/sign-up/accept}" th:object="${student}" method="post"
+          style="max-width: 220px; margin: 0 auto; font-size: larger;">
 
-			<p>
-				<label for="faculty" class="sr-only">Faculty*</label> <input
-					type="text" id="facutly" name="faculty" class="form-control"
-					placeholder="faculty" required>
-			</p>
+        <h3 class="form-signin-heading" align="center">New User</h3>
 
+        <div class="form-group">
+            <input type="hidden" name="userId" id="userId" th:field="*{user.userId}"/>
+        </div>
 
-			<p>
-				<label for="year" class="sr-only">Year of enrollment*</label> <select
-					id="year" name="year" class="form-control" required>
-					<option value="2017">2017</option>
-					<option value="2018">2018</option>
-					<option value="2019">2019</option>
-					<option value="2020">2020</option>
-				</select>
-			</p>
+        <div th:class="${#fields.hasErrors('user.name') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" th:field="*{user.name}" style="width: 220px;" class="form-control" placeholder="Name" required/>
+            <label class="control-label" for="name" th:if="${#fields.hasErrors('user.name')}" th:errors="*{user.name}">Incorrect
+                name</label>
+        </div>
 
+        <div th:class="${#fields.hasErrors('user.surname') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="surname">Surname</label>
+            <input type="text" name="surname" id="surname" th:field="*{user.surname}" style="width: 220px;" class="form-control"placeholder="Surname" required/>
+            <label class="control-label" for="surname" th:if="${#fields.hasErrors('user.surname')}" th:errors="*{user.surname}">Incorrect
+                surname</label>
+        </div>
 
-			<button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
-			<a href="/login-custom" target="_self">Cancel</a>
-		</form>
-	</div>
+        <div th:class="${#fields.hasErrors('user.email') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="email">E-mail</label>
+            <input type="text" name="email" id="email" th:field="*{user.email}" style="width: 220px;" class="form-control" placeholder="E-mail" required/>
+            <label class="control-label" for="email" th:if="${#fields.hasErrors('user.email')}"
+                   th:errors="*{user.email}">Incorrect e-mail</label>
+        </div>
+
+        <div th:class="${#fields.hasErrors('user.password') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" th:field="*{user.password}" class="form-control" placeholder="Password" required/>
+            <label class="control-label" for="password" th:if="${#fields.hasErrors('user.password')}"
+                   th:errors="*{user.password}">Incorrect
+                password</label>
+        </div>
+
+        <div th:class="${#fields.hasErrors('entranceYear') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="year">Year</label>
+            <select name="year" id="year" th:field="*{entranceYear}" style="width: 50px" class="form-control">
+                <option th:value="2017" th:text="2017"></option>
+                <option th:value="2018" th:text="2018"></option>
+                <option th:value="2019" th:text="2019"></option>
+                <option th:value="2020" th:text="2020"></option>
+            </select>
+            <label class="control-label" for="year" th:if="${#fields.hasErrors('entranceYear')}"
+                   th:errors="*{entranceYear}">Incorrect year</label>
+        </div>
+
+        <div>
+            <label for="organisation">Organisation</label>
+            <select name="organisation" id="organisation"  style="width: 150px" class="form-control">
+                <option value="0" th:text="--Select--"></option>
+                <option th:each="organisation : ${organisations}"
+                        th:value="${organisation.orgId}"
+                        th:text="${organisation.name}">Organisation
+                </option>
+            </select>
+        </div>
+
+        <div>
+            <label for="faculty">Faculty</label>
+            <select name="faculty" id="faculty" style="width: 150px" class="form-control">
+                <option value="0" th:text="--Select--"></option>
+                <option th:each="faculty : ${faculties}"
+                        th:value="${faculty.facId}"
+                        th:text="${faculty.name}">Faculty
+                </option>
+            </select>
+        </div>
+
+     <!--   <div th:class="${#fields.hasErrors('studentClass') ? 'form-group has-error has-feedback' : 'form-group has success'}">
+            <label for="class">Class</label>
+            <select name="class" id="class" th:field="*{studentClass}" style="width: 150px" class="form-control">
+                <option value="0" th:text="&#45;&#45;Select&#45;&#45;"></option>
+                <option th:each="class : ${classes}"
+                        th:value="${class.classId}"
+                        th:text="${class.name}">Class
+                </option>
+            </select>
+            <label class="control-label" for="class" th:if="${#fields.hasErrors('studentClass')}"
+                   th:errors="*{studentClass}">Incorrect class</label>
+        </div>-->
+
+        <label class="label label-danger" th:text="${unexpectedError}"/>
+
+        <div class="form-group">
+            <div class="btn-group btn-group-justified">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <div class="btn-group">
+                    <a th:href="@{/login-custom}">
+                        <input type="button" class="btn btn-default" value="Cancel"/>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 </body>
 </html>

@@ -54,32 +54,37 @@ public class LTIAwareUsernamePasswordAuthenticationFilter extends UsernamePasswo
                 SecurityContextHolder.getContext().setAuthentication(previousAuth);
                 throw e;
             }
-            LOG.debug("Obtained a valid authentication with UsernamePasswordAuthenticationFilter");
-            AuthenticatedUser authenticatedUser = (AuthenticatedUser) authentication.getPrincipal();
-            Long userId = authenticatedUser.getUserId();
-            String email = authenticatedUser.getUsername();
-            Collection<GrantedAuthority> newAuthorities = authenticatedUser.getAuthorities();
-
-            LTIToolConsumerCredentials ltiToolConsumerCredentials = (LTIToolConsumerCredentials) previousAuth.getPrincipal();
-            LTIUserConsumerCredentials ltiUserConsumerCredentials =
-                    LTIUserConsumerCredentials.create(userId, ltiToolConsumerCredentials.getLmsId(), ltiToolConsumerCredentials);
-            ltiUserConsumerCredentials.setOutcome(ltiToolConsumerCredentials.getOutcome().orElse(null));
-            ltiUserConsumerCredentials.setUser(ltiToolConsumerCredentials.getUser().orElse(null));
-            ltiUserConsumerCredentials.setEmail(email);
-
-            List<GrantedAuthority> updatedAuthorities = new ArrayList<>(newAuthorities);
-            updatedAuthorities.addAll(previousAuth.getAuthorities());
-
-            Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                    ltiUserConsumerCredentials, previousAuth.getCredentials(), Collections.unmodifiableList(updatedAuthorities));
-            LOG.debug("Created an updated authentication for user ID :: "+ userId);
+            Authentication newAuth = mergeAuthentication(previousAuth, authentication);
             return newAuth;
         }
         LOG.debug("No LTI authentication exists, try to authenticate with UsernamePasswordAuthenticationFilter in the usual way");
         return super.attemptAuthentication(request, response);
     }
 
-	@Override
+    private Authentication mergeAuthentication(Authentication previousAuth, Authentication newAuthentication) {
+        LOG.debug("Obtained a valid authentication with UsernamePasswordAuthenticationFilter");
+        AuthenticatedUser authenticatedUser = (AuthenticatedUser) newAuthentication.getPrincipal();
+        Long userId = authenticatedUser.getUserId();
+        String email = authenticatedUser.getUsername();
+        Collection<GrantedAuthority> newAuthorities = authenticatedUser.getAuthorities();
+
+        LTIToolConsumerCredentials ltiToolConsumerCredentials = (LTIToolConsumerCredentials) previousAuth.getPrincipal();
+        LTIUserConsumerCredentials ltiUserConsumerCredentials =
+                LTIUserConsumerCredentials.create(userId, ltiToolConsumerCredentials.getLmsId(), ltiToolConsumerCredentials);
+        ltiUserConsumerCredentials.setOutcome(ltiToolConsumerCredentials.getOutcome().orElse(null));
+        ltiUserConsumerCredentials.setUser(ltiToolConsumerCredentials.getUser().orElse(null));
+        ltiUserConsumerCredentials.setEmail(email);
+
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(newAuthorities);
+        updatedAuthorities.addAll(previousAuth.getAuthorities());
+
+        Authentication resultingAuthentication = new UsernamePasswordAuthenticationToken(
+                ltiUserConsumerCredentials, previousAuth.getCredentials(), Collections.unmodifiableList(updatedAuthorities));
+        LOG.debug("Created an updated authentication for user ID :: "+ userId);
+        return resultingAuthentication;
+    }
+
+    @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed)
             throws IOException, ServletException {
         Authentication previousAuth = SecurityContextHolder.getContext().getAuthentication();

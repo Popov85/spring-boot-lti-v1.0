@@ -10,11 +10,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
-public class LTIAwareAccessDeniedHandler extends AccessDeniedHandlerImpl {
+public class LTIAwareAccessDeniedHandler implements AccessDeniedHandler {
 	
 	private static final Log LOG = LogFactory.getLog(LTIAwareAccessDeniedHandler.class);
 	
@@ -31,13 +30,10 @@ public class LTIAwareAccessDeniedHandler extends AccessDeniedHandlerImpl {
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
-		LOG.debug("Custom exception handler in action...");
+
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
 		if (ltiSecurityUtils.isLMSUserWithOnlyLTIRole(auth)) {
-			// Prohibited to authorize LTI user trying to access protected resource
-			
-			LOG.debug("Prohibited to authorize LTI user trying to access protected resource.., redirected to /login");
+			LOG.debug("Detected an LTI user lacking authority trying to access protected resource.., redirected to /login");
 			// Remember the request pathway
 			RequestCache requestCache = new HttpSessionRequestCache();
 			requestCache.saveRequest(request, response);
@@ -45,18 +41,9 @@ public class LTIAwareAccessDeniedHandler extends AccessDeniedHandlerImpl {
 			response.sendRedirect(request.getContextPath() + "/login-custom");
 			return;
 		}
-		
-		// Already authorized user lacking authorities
-		if (auth!=null) {
-			LOG.debug("Ordinary redirection to /accessDenied URL..");
-	        response.sendRedirect(request.getContextPath() + "/accessDenied");
-			return;
-		}
-		
-		// Anonymous user
-		LOG.debug("Anonymous..");
-        response.sendRedirect(request.getContextPath() + "/login-custom");
-		//super.handle(request, response, accessDeniedException);
+
+		LOG.debug("Detected a non-LTI user lacking authority trying to access protected resource, redirection to /access-denied endpoint");
+		response.sendRedirect(request.getContextPath() + "/access-denied");
 	}
 
 }

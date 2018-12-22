@@ -11,14 +11,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 @RestController
-public class LTIPostScoreController {
+public class LTIOutcomeController {
 	
-	private static final Log LOG = LogFactory.getLog(LTIPostScoreController.class);
+	private static final Log LOG = LogFactory.getLog(LTIOutcomeController.class);
 
     @Autowired
     private LTIOutcomeService ltiOutcomeService;
 
-    private static final String RESULT = "0.6";
+    private static final String RESULT = "0.95";
 
     private static final String CLIENT_KEY = "ratos_client_key";
 

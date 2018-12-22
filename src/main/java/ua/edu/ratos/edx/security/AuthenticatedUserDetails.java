@@ -1,39 +1,35 @@
 package ua.edu.ratos.edx.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import ua.edu.ratos.edx.domain.Student;
+import ua.edu.ratos.edx.repository.LocalStudentHolder;
+
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Optional;
 
 @Component
 public class AuthenticatedUserDetails implements UserDetailsService {
 
-    private Map<String, String> passwordsHolder = new HashMap<>();
-
-    private Map<String, Long> usersHolder = new HashMap<>();
+    @Autowired
+    private LocalStudentHolder localStudentHolder;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (usersHolder.get(username)!=null) {
-            return new AuthenticatedUser(usersHolder.get(username), username, passwordsHolder.get(username),
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<Student> student = localStudentHolder.getByEmail(email);
+        if (student.isPresent()) {
+            return new AuthenticatedUser(student.get().getUser().getUserId(),
+                    email,
+                    String.valueOf(student.get().getUser().getPassword()),
                     AuthorityUtils.createAuthorityList("ROLE_STUDENT"));
         }
         throw new UsernameNotFoundException("DAO authentication failed, no such user e-mail exists in the DB");
     }
 
-    @PostConstruct
-    public void init() {
-        this.usersHolder.put("admin@example.com", 1L);
-        this.usersHolder.put("labassist@example.com", 2L);
-        this.usersHolder.put("student@example.com", 3L);
-
-        this.passwordsHolder.put("admin@example.com", "{noop}password");
-        this.passwordsHolder.put("labassist@example.com", "{noop}password");
-        this.passwordsHolder.put("student@example.com", "{noop}password");
-    }
 }

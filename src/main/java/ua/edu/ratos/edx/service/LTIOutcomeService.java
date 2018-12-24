@@ -30,6 +30,9 @@ public class LTIOutcomeService {
 		
 	@Autowired
 	private XMLScoreRequestBodyBuilder xmlScoreRequestBodyBuilder;
+	
+	@Autowired
+	private LTIRetryOutcomeService ltiRetryOutcomeService;
 
     /**
      * Sends score to Learning Management System (LMS) if it was configured to allow sending outcomes,
@@ -39,23 +42,21 @@ public class LTIOutcomeService {
      * @see <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-3">LTI v 1.1.1</a>
      * @throws Exception
      */
-    public void sendOutcome(final Authentication authentication, final Double score) throws Exception {
+    public void sendOutcome(final Authentication authentication, final Long schemeId, final Double score) throws Exception {
         LTIUserConsumerCredentials principal = (LTIUserConsumerCredentials)authentication.getPrincipal();
         Optional<LTIOutcomeParams> outcome = principal.getOutcome();
         if (!outcome.isPresent()) {
             LOG.warn("Outcome parameters are not included, result is not sent to LMS :: "+ score);
             return;
         }
-        // Create a client-secret-aware rest template for posting score to LMS
-        BaseProtectedResourceDetails resourceDetails = new BaseProtectedResourceDetails();
-        resourceDetails.setConsumerKey(principal.getConsumerKey());
-        resourceDetails.setSharedSecret((SignatureSecret) authentication.getCredentials()); 
-        OAuthRestTemplate authRestTemplate = new OAuthRestTemplate(resourceDetails);
+        OAuthRestTemplate authRestTemplate = getOAuthRestTemplate(authentication, principal);
 
         String sourcedId = outcome.get().getSourcedId();
         String outcomeURL = outcome.get().getOutcomeURL();
         
+        // TODO :: resolve actual http/https method
         String newOutcomeURL = outcomeURL.replaceAll("https", "http");
+        URI uri = new URI(newOutcomeURL);
       
         // Just to keep things simple, create a value of milliseconds since 1970
         String messageIdentifier = Long.toString(new Date().getTime());
@@ -66,21 +67,47 @@ public class LTIOutcomeService {
 
         String body = xmlScoreRequestBodyBuilder.getEnvelopeRequestBody(sourcedId, messageIdentifier, textScore);
                
-        // Add an additional parameter, specifically: oauth_body_hash
+        // Add additional oauth_body_hash parameter as per OAuth extension
+        addAdditionalParam(authRestTemplate, body);
+
+        HttpEntity<String> request = new HttpEntity<String>(body, headers);
+        
+        // try to send multiple times for sure
+        String email= principal.getEmail().get();
+        ltiRetryOutcomeService.doSend(authRestTemplate, uri, request, email, schemeId);
+
+    }
+	
+
+    /**
+     * Create a client-secret-aware rest template instance for posting score to LMS
+     * @param authentication
+     * @param principal
+     * @return
+     */
+	private OAuthRestTemplate getOAuthRestTemplate(final Authentication authentication,
+			LTIUserConsumerCredentials principal) {
+        BaseProtectedResourceDetails resourceDetails = new BaseProtectedResourceDetails();
+        resourceDetails.setConsumerKey(principal.getConsumerKey());
+        resourceDetails.setSharedSecret((SignatureSecret) authentication.getCredentials()); 
+        OAuthRestTemplate authRestTemplate = new OAuthRestTemplate(resourceDetails);
+		return authRestTemplate;
+	}
+
+    /**
+     * Add an additional parameter, specifically: oauth_body_hash
+     * @param authRestTemplate
+     * @param body
+     * @throws NoSuchAlgorithmException
+     */
+	private void addAdditionalParam(OAuthRestTemplate authRestTemplate, String body) {
         OAuthClientHttpRequestFactory requestFactory = (OAuthClientHttpRequestFactory) authRestTemplate.getRequestFactory();
         Map<String, String> additionalOAuthParameters = new HashMap<>();
         String hash = doXMLBodyHashSHA1(body);
         additionalOAuthParameters.put("oauth_body_hash", hash);
         requestFactory.setAdditionalOAuthParameters(additionalOAuthParameters);
-        
         LOG.debug("oauth_body_hash:: "+hash);
-
-        HttpEntity<String> request = new HttpEntity<String>(body, headers);
-        
-        String result = authRestTemplate.postForObject(new URI(newOutcomeURL),request, String.class);
-
-        LOG.debug("Result  :: "+ textScore+", sent with message :: "+ result);
-    }
+	}
 
     /**
      * As per LTI v 1.1.1 specification the request's XML body has to be hashed with SHA-1;
@@ -89,9 +116,14 @@ public class LTIOutcomeService {
      * @return
      * @throws NoSuchAlgorithmException
      */
-	private String doXMLBodyHashSHA1(String body) throws NoSuchAlgorithmException {
+	private String doXMLBodyHashSHA1(String body) {
 		String algorithmCode = "SHA-1";
-		MessageDigest md = MessageDigest.getInstance(algorithmCode);
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance(algorithmCode);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Failed to hash XML body", e);
+		}
 		md.update(body.getBytes());
 		byte[] output = Base64.encodeBase64(md.digest());
         String hash = new String(output);

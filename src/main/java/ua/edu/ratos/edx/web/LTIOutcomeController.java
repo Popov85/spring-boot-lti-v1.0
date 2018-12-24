@@ -20,7 +20,7 @@ public class LTIOutcomeController {
     @Autowired
     private LTIOutcomeService ltiOutcomeService;
 
-    private static final String SCORE = "1.0";
+    private static final String SCORE = "0.7";
 
 
     private static final String CLIENT_SECRET = "ratos_client_secret";
@@ -38,7 +38,7 @@ public class LTIOutcomeController {
     		throw new RuntimeException("Cannot post the score, no outcome info!");
     	}
     	
-    	// edX sends https callback URL even if the actual is http
+    	// edX sends https callback URL even if the actual protocol is http
     	String outcomeURL = outcome.get().getOutcomeURL();
     	
         String newOutcomeURL = outcomeURL.replaceAll("https", "http");
@@ -58,7 +58,7 @@ public class LTIOutcomeController {
     	LOG.debug("Authentication :: "+authentication);
     	LOG.debug("Try to post score with Spring :: "+SCORE);
     	
-        ltiOutcomeService.sendOutcome(authentication, Double.parseDouble(SCORE));
+        ltiOutcomeService.sendOutcome(authentication, 1L, Double.parseDouble(SCORE));
         
     	LOG.debug("Success posting with Spring :: "+SCORE);
         return "OK";

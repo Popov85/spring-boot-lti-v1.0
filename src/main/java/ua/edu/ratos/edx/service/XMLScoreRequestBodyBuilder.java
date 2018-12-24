@@ -39,7 +39,7 @@ public class XMLScoreRequestBodyBuilder {
 	 * @throws Exception 
      * @see <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-3">LTI v 1.1.1</a>
      */
-    public String getEnvelopeRequestBodyAsString(String sourcedId, String messageIdentifier, String textScore) throws Exception {
+    public String getEnvelopeRequestBody(String sourcedId, String messageIdentifier, String textScore) throws Exception {
             	
     	IMSXPOXEnvelopeRequest envelopeRequest = 
 		new IMSXPOXEnvelopeRequest()

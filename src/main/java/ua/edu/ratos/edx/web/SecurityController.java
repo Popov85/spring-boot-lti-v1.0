@@ -15,21 +15,9 @@ import ua.edu.ratos.edx.repository.LocalClassesHolder;
 import ua.edu.ratos.edx.repository.LocalFacultiesHolder;
 import ua.edu.ratos.edx.repository.LocalOrganisationsHolder;
 import ua.edu.ratos.edx.repository.LocalStudentHolder;
-import ua.edu.ratos.edx.service.XMLScoreRequestBodyBuilder;
-import ua.edu.ratos.edx.web.domain.IMSXPOXBody;
-import ua.edu.ratos.edx.web.domain.IMSXPOXEnvelopeRequest;
-import ua.edu.ratos.edx.web.domain.IMSXPOXHeader;
-import ua.edu.ratos.edx.web.domain.IMSXPOXRequestHeaderInfo;
-import ua.edu.ratos.edx.web.domain.ReplaceResultRequest;
-import ua.edu.ratos.edx.web.domain.Result;
-import ua.edu.ratos.edx.web.domain.ResultRecord;
-import ua.edu.ratos.edx.web.domain.ResultScore;
-import ua.edu.ratos.edx.web.domain.SourcedGUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.*;
 import java.security.Principal;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Set;
 
@@ -105,7 +93,6 @@ public class SecurityController {
         if (result.hasErrors()) {
             LOG.error("# of errors is: "+result.getFieldErrorCount());
             result.getAllErrors().forEach(err->LOG.error("errors is :: "+err.toString()));
-            //model.addAttribute("student", student);
             return "my-sign-up";
         }
         localStudentHolder.addStudent(student.getUser().getEmail(), student);
@@ -161,17 +148,7 @@ public class SecurityController {
         return "admin";
     }
     
-    @Autowired
-	private XMLScoreRequestBodyBuilder xmlScoreRequestBodyBuilder;
-    
-    @GetMapping("/body")
-    @ResponseBody
-    public String getBody() throws Exception {
-    	String messageIdentifier = Long.toString(new Date().getTime());
-        String body = xmlScoreRequestBodyBuilder.getEnvelopeRequestBodyAsString("sourcedId", messageIdentifier, "0.5");
-        LOG.debug("body :: "+body);
-        return body;
-    }
+    //-------------------- DEBUG-----------------
     
     @PostMapping("/ratos/receive")
     @ResponseStatus(code = HttpStatus.OK)

@@ -8,6 +8,7 @@ public class LTIApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LTIApplication.class, args);
+		System.setProperty("debug", "1");
 	}
 	
 }

@@ -8,10 +8,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import ua.edu.ratos.edx.domain.Student;
 import ua.edu.ratos.edx.repository.LocalStudentHolder;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Component

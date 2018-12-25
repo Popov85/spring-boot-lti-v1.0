@@ -12,7 +12,7 @@ public class LTISecurityUtils {
 	private static final Log LOG = LogFactory.getLog(LTISecurityUtils.class);
 
 	public boolean isLMSUserWithOnlyLTIRole(Authentication auth) {
-		LOG.debug("Try to decide which user is it?");
+		LOG.debug("Challenge whether it is an LMS user with only LTI role?");
 		if (auth == null)
 			return false;
 		if (!auth.getPrincipal().getClass().equals(LTIToolConsumerCredentials.class))
@@ -22,6 +22,21 @@ public class LTISecurityUtils {
 		if (!auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_LTI")))
 			return false;
 		return true;
+	}
+	
+	public boolean isLMSUserWithLTIAndSTUDENTRoles(Authentication auth) {
+		LOG.debug("Challenge whether it is an LMS user with both LTI & STUDENT roles?");
+		if (auth == null)
+			return false;
+		if (!auth.getPrincipal().getClass().equals(LTIUserConsumerCredentials.class))
+			return false;
+		if (auth.getAuthorities().size() != 2)
+			return false;
+		if (!auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_LTI")) 
+				|| !auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STUDENT")))
+			return false;
+		return true;
+		
 	}
 
 }

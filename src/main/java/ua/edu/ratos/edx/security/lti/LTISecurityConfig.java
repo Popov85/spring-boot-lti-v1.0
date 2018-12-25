@@ -28,6 +28,9 @@ public class LTISecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private LTIAuthenticationHandler ltiAuthenticationHandler;
+    
+    @Autowired
+    private LTISecurityUtils ltiSecurityUtils;
 
     // CORS bean
     @Bean
@@ -50,7 +53,7 @@ public class LTISecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public ProtectedResourceProcessingFilter ltiProtectedResourceProcessingFilter() {
         ProtectedResourceProcessingFilter protectedResourceProcessingFilter =
-                new LTIProtectedResourceProcessingFilter();
+                new LTIProtectedResourceProcessingFilter(ltiSecurityUtils);
         protectedResourceProcessingFilter.setConsumerDetailsService(ltiConsumerDetailsService);
         protectedResourceProcessingFilter.setAuthHandler(ltiAuthenticationHandler);
         protectedResourceProcessingFilter.setTokenServices(oauthProviderTokenServices());

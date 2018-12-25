@@ -1,4 +1,4 @@
-package ua.edu.ratos.edx.web.domain;
+package ua.edu.ratos.edx.web.domain.request;
 
 public class IMSXPOXBody {
 	

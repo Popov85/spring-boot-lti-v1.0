@@ -1,16 +1,12 @@
 package ua.edu.ratos.edx.web;
 
-import java.util.Iterator;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
 import ua.edu.ratos.edx.security.lti.LTIToolConsumerCredentials;
 
 
@@ -34,7 +30,7 @@ public class LTILaunchController {
 		return "redirect:/student/start";
 	}
 
-	private void printParameters(HttpServletRequest request) {
+	/*private void printParameters(HttpServletRequest request) {
 		Map<String, String[]> params = request.getParameterMap();
 		Iterator<String> i = params.keySet().iterator();
 		while (i.hasNext()) {
@@ -43,6 +39,6 @@ public class LTILaunchController {
 			LOG.debug("key :: "+key);
 			LOG.debug("value :: "+value);
 		}
-	}
+	}*/
 
 }

@@ -11,6 +11,8 @@ import ua.edu.ratos.edx.service.LTIOutcomeService;
 import ua.edu.ratos.edx.service.MYIMSPOXRequest;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/student")
 public class LTIOutcomeController {
@@ -20,7 +22,7 @@ public class LTIOutcomeController {
     @Autowired
     private LTIOutcomeService ltiOutcomeService;
 
-    private static final String SCORE = "0.7";
+    private static final String SCORE = "0.75";
 
 
     private static final String CLIENT_SECRET = "ratos_client_secret";
@@ -54,11 +56,11 @@ public class LTIOutcomeController {
 
     @GetMapping("/post-score-spring")
     @ResponseBody
-    public String postScoreSpring(Authentication authentication) throws Exception {
+    public String postScoreSpring(Authentication authentication, HttpServletRequest request) throws Exception {
     	LOG.debug("Authentication :: "+authentication);
     	LOG.debug("Try to post score with Spring :: "+SCORE);
     	
-        ltiOutcomeService.sendOutcome(authentication, 1L, Double.parseDouble(SCORE));
+        ltiOutcomeService.sendOutcome(authentication, request.getScheme(), 1L, Double.parseDouble(SCORE));
         
     	LOG.debug("Success posting with Spring :: "+SCORE);
         return "OK";

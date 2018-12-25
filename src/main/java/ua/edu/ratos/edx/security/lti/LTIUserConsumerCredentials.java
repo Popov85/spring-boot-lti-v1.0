@@ -29,6 +29,7 @@ public class LTIUserConsumerCredentials extends LTIToolConsumerCredentials {
     public Long getUserId() {
         return userId;
     }
+    
 
     @Override
     public String toString() {

@@ -2,6 +2,7 @@ package ua.edu.ratos.edx.security.lti;
 
 
 import org.springframework.security.oauth.provider.ConsumerCredentials;
+
 import java.security.Principal;
 import java.util.Optional;
 
@@ -48,6 +49,11 @@ public class LTIToolConsumerCredentials extends ConsumerCredentials implements P
         this.outcome = outcome;
         return this;
     }
+    
+    public ConsumerCredentials getConsumerCredentials() {
+    	return new ConsumerCredentials(this.getConsumerKey(), this.getSignature(), this.getSignatureMethod(), this.getSignatureBaseString(), this.getToken());
+    }
+    
 
     /**
      * Recommended parameter to include to a launch request to smoothly recognize a learner;

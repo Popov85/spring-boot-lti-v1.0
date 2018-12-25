@@ -29,10 +29,12 @@ public class LTIOutcomeService {
 	private static final Log LOG = LogFactory.getLog(LTIOutcomeService.class);
 		
 	@Autowired
-	private XMLScoreRequestBodyBuilder xmlScoreRequestBodyBuilder;
+	private XMLRequestBodyBuilder xmlRequestBodyBuilder;
 	
 	@Autowired
 	private LTIRetryOutcomeService ltiRetryOutcomeService;
+	
+	private static final boolean FIX_PROTOCOL = true;
 
     /**
      * Sends score to Learning Management System (LMS) if it was configured to allow sending outcomes,
@@ -42,7 +44,7 @@ public class LTIOutcomeService {
      * @see <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-3">LTI v 1.1.1</a>
      * @throws Exception
      */
-    public void sendOutcome(final Authentication authentication, final Long schemeId, final Double score) throws Exception {
+    public void sendOutcome(final Authentication authentication, final String protocol, final Long schemeId, final Double score) throws Exception {
         LTIUserConsumerCredentials principal = (LTIUserConsumerCredentials)authentication.getPrincipal();
         Optional<LTIOutcomeParams> outcome = principal.getOutcome();
         if (!outcome.isPresent()) {
@@ -54,9 +56,11 @@ public class LTIOutcomeService {
         String sourcedId = outcome.get().getSourcedId();
         String outcomeURL = outcome.get().getOutcomeURL();
         
-        // TODO :: resolve actual http/https method
-        String newOutcomeURL = outcomeURL.replaceAll("https", "http");
-        URI uri = new URI(newOutcomeURL);
+        String actualOutcomeURL = new String(outcomeURL);
+        
+        if (FIX_PROTOCOL) actualOutcomeURL = fixProtocol(outcomeURL, protocol);
+    
+        URI uri = new URI(actualOutcomeURL);
       
         // Just to keep things simple, create a value of milliseconds since 1970
         String messageIdentifier = Long.toString(new Date().getTime());
@@ -65,7 +69,7 @@ public class LTIOutcomeService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
 
-        String body = xmlScoreRequestBodyBuilder.getEnvelopeRequestBody(sourcedId, messageIdentifier, textScore);
+        String body = xmlRequestBodyBuilder.build(sourcedId, messageIdentifier, textScore);
                
         // Add additional oauth_body_hash parameter as per OAuth extension
         addAdditionalParam(authRestTemplate, body);
@@ -83,7 +87,7 @@ public class LTIOutcomeService {
      * Create a client-secret-aware rest template instance for posting score to LMS
      * @param authentication
      * @param principal
-     * @return
+     * @return rest template
      */
 	private OAuthRestTemplate getOAuthRestTemplate(final Authentication authentication,
 			LTIUserConsumerCredentials principal) {
@@ -92,6 +96,28 @@ public class LTIOutcomeService {
         resourceDetails.setSharedSecret((SignatureSecret) authentication.getCredentials()); 
         OAuthRestTemplate authRestTemplate = new OAuthRestTemplate(resourceDetails);
 		return authRestTemplate;
+	}
+	
+	
+	/**
+	 * In some cases, LMS expects TP to send the outcome to a different protocol than is actually used;
+	 * This service method is optional, decide if you need to use it, if not just omit it
+	 * e.g. (actual HTTP & expected HTTP)
+	 * @param url, like  https://open-edx.org/outcome-service
+	 * @param protocol {http, https, ftp}
+	 * @return fixed URL
+	 */
+	private String fixProtocol(String initialURL, String protocol) {
+		int end = initialURL.indexOf(':');
+		String initialProtocol = initialURL.substring(0, end);
+		LOG.debug("Initial protocol :: "+initialProtocol);
+		if (!initialProtocol.equals(protocol)) {
+			// replace the initial protocol with the actual one
+			String result = initialURL.replace(initialProtocol, protocol);
+			LOG.debug("Fixed protocol :: "+result);
+			return result;
+		}
+		return initialURL;
 	}
 
     /**

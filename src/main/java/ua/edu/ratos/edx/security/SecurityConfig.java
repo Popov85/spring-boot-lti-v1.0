@@ -34,10 +34,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Bean
     public LTIAwareUsernamePasswordAuthenticationFilter ltiAwareUsernamePasswordAuthenticationFilter() throws Exception {
-        LTIAwareUsernamePasswordAuthenticationFilter filter = new LTIAwareUsernamePasswordAuthenticationFilter();
+        LTIAwareUsernamePasswordAuthenticationFilter filter = new LTIAwareUsernamePasswordAuthenticationFilter(ltiSecurityUtils);
         filter.setAuthenticationManager(authenticationManager());
         filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login-custom?error=true"));
-        filter.setLtiSecurityUtils(ltiSecurityUtils);
         return filter;
     }
 

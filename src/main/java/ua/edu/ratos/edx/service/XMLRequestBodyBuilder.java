@@ -7,20 +7,21 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import ua.edu.ratos.edx.web.domain.IMSXPOXBody;
-import ua.edu.ratos.edx.web.domain.IMSXPOXEnvelopeRequest;
-import ua.edu.ratos.edx.web.domain.IMSXPOXHeader;
-import ua.edu.ratos.edx.web.domain.IMSXPOXRequestHeaderInfo;
-import ua.edu.ratos.edx.web.domain.ReplaceResultRequest;
-import ua.edu.ratos.edx.web.domain.Result;
-import ua.edu.ratos.edx.web.domain.ResultRecord;
-import ua.edu.ratos.edx.web.domain.ResultScore;
-import ua.edu.ratos.edx.web.domain.SourcedGUID;
+
+import ua.edu.ratos.edx.web.domain.request.IMSXPOXBody;
+import ua.edu.ratos.edx.web.domain.request.IMSXPOXEnvelopeRequest;
+import ua.edu.ratos.edx.web.domain.request.IMSXPOXHeader;
+import ua.edu.ratos.edx.web.domain.request.IMSXPOXRequestHeaderInfo;
+import ua.edu.ratos.edx.web.domain.request.ReplaceResultRequest;
+import ua.edu.ratos.edx.web.domain.request.Result;
+import ua.edu.ratos.edx.web.domain.request.ResultRecord;
+import ua.edu.ratos.edx.web.domain.request.ResultScore;
+import ua.edu.ratos.edx.web.domain.request.SourcedGUID;
 
 @Service
-public class XMLScoreRequestBodyBuilder {
+public class XMLRequestBodyBuilder {
 	
-	private static final Log LOG = LogFactory.getLog(XMLScoreRequestBodyBuilder.class);
+	private static final Log LOG = LogFactory.getLog(XMLRequestBodyBuilder.class);
 
 	  private XmlMapper xmlMapper;
 
@@ -39,7 +40,7 @@ public class XMLScoreRequestBodyBuilder {
 	 * @throws Exception 
      * @see <a href="https://www.imsglobal.org/specs/ltiv1p1p1/implementation-guide#toc-3">LTI v 1.1.1</a>
      */
-    public String getEnvelopeRequestBody(String sourcedId, String messageIdentifier, String textScore) throws Exception {
+    public String build(String sourcedId, String messageIdentifier, String textScore) throws Exception {
             	
     	IMSXPOXEnvelopeRequest envelopeRequest = 
 		new IMSXPOXEnvelopeRequest()
@@ -56,7 +57,7 @@ public class XMLScoreRequestBodyBuilder {
                                                 .setTextString(textScore))))));
     	
     	String body = xmlMapper.writeValueAsString(envelopeRequest);
-    	LOG.debug("body :: "+body);
+    	LOG.debug("XML body :: "+body);
     	return body;
     }
 
